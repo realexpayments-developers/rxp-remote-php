@@ -161,7 +161,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Tests the hash calculation for a settle payment->
+	 * Tests the hash calculation for a settle payment.
 	 */
 	public function testSettleHashGeneration() {
 		$request = new PaymentRequest();
@@ -174,7 +174,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Tests the hash calculation for a void payment->
+	 * Tests the hash calculation for a void payment.
 	 */
 	public function testVoidHashGeneration() {
 		$request = new PaymentRequest();
@@ -186,7 +186,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Tests the hash calculation for a rebate payment->
+	 * Tests the hash calculation for a rebate payment.
 	 */
 	public function testRebateHashGeneration() {
 		$request = new PaymentRequest();
@@ -199,7 +199,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Tests the hash calculation for an OTB request->
+	 * Tests the hash calculation for an OTB request.
 	 */
 	public function testOTBHashGeneration() {
 		$request = new PaymentRequest();
@@ -211,7 +211,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Tests the hash calculation for a credit payment->
+	 * Tests the hash calculation for a credit payment.
 	 */
 	public function testCreditHashGeneration() {
 		$request = new PaymentRequest();
@@ -224,7 +224,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Tests the hash calculation for a hold payment->
+	 * Tests the hash calculation for a hold payment.
 	 */
 	public function testHoldHashGeneration() {
 		$request = new PaymentRequest();
@@ -236,7 +236,7 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Tests the hash calculation for a release payment->
+	 * Tests the hash calculation for a release payment.
 	 */
 	public function testReleaseHashGeneration() {
 		$request = new PaymentRequest();
@@ -245,6 +245,18 @@ class PaymentRequestTest extends \PHPUnit_Framework_TestCase {
 		$request->hash( SampleXmlValidationUtils::SECRET );
 
 		$this->assertEquals( SampleXmlValidationUtils::RELEASE_REQUEST_HASH, $request->getHash() );
+	}
+
+	/**
+	 * Tests the hash calculation for a query payment.
+	 */
+	public function testQueryHashGeneration() {
+		$request = new PaymentRequest();
+		$request->addType( PaymentType::QUERY )->addTimeStamp( SampleXmlValidationUtils::QUERY_TIMESTAMP )->addMerchantId( SampleXmlValidationUtils::QUERY_MERCHANT_ID )
+		        ->addOrderId( SampleXmlValidationUtils::QUERY_ORDER_ID );
+		$request->hash( SampleXmlValidationUtils::SECRET );
+
+		$this->assertEquals( SampleXmlValidationUtils::QUERY_REQUEST_HASH, $request->getHash() );
 	}
 
 

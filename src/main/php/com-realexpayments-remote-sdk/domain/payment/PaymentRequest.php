@@ -192,6 +192,19 @@ use com\realexpayments\remote\sdk\utils\XmlUtils;
  *
  * </pre></code></p>
  *
+ * <p>
+ * Example Release
+ * <p>
+ * <p><code><pre>
+ *
+ * $request = ( new PaymentRequest() )
+ *    ->addAccount( "myAccount" )
+ *    ->addMerchantId( "myMerchantId" )
+ *    ->addType( PaymentType::QUERY )
+ *    ->addOrderId("Order ID from original transaction");
+ *
+ * </pre></code></p>
+ *
  * @author vicpada
  * @package com\realexpayments\remote\sdk\domain\payment
  */

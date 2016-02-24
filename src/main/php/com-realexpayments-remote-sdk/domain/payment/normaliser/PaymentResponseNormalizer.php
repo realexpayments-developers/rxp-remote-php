@@ -9,6 +9,7 @@ use com\realexpayments\remote\sdk\domain\payment\PaymentResponse;
 use com\realexpayments\remote\sdk\domain\payment\TssResult;
 use com\realexpayments\remote\sdk\domain\payment\TssResultCheck;
 use com\realexpayments\remote\sdk\SafeArrayAccess;
+use com\realexpayments\remote\sdk\utils\NormaliserHelper;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 class PaymentResponseNormalizer extends AbstractNormalizer {
@@ -45,6 +46,7 @@ class PaymentResponseNormalizer extends AbstractNormalizer {
 		$response->setAvsAddressResponse( $array['avsaddressresponse'] );
 		$response->setTssResult( $this->denormaliseTss( $array ) );
 		$response->setCardIssuer( $this->denormaliseCardIssuer( $array ) );
+		$response->setCardNumber( $array['cardnumber'] );
 
 
 		return $response;
@@ -156,8 +158,9 @@ class PaymentResponseNormalizer extends AbstractNormalizer {
 				'tss'                 => $this->normaliseTss( $object ),
 				'avspostcoderesponse' => $object->getAvsPostcodeResponse(),
 				'avsaddressresponse'  => $object->getAvsAddressResponse(),
+				'cardnumber'          => $object->getCardNumber(),
 
-			) );
+			), array( NormaliserHelper::GetClassName(), "filter_data" ) );
 	}
 
 	/**
@@ -187,7 +190,7 @@ class PaymentResponseNormalizer extends AbstractNormalizer {
 			'country'     => $cardIssuer->getCountry(),
 			'countrycode' => $cardIssuer->getCountryCode(),
 			'region'      => $cardIssuer->getRegion()
-		) );
+		), array( NormaliserHelper::GetClassName(), "filter_data" ) );
 	}
 
 	private function normaliseTss( PaymentResponse $response ) {

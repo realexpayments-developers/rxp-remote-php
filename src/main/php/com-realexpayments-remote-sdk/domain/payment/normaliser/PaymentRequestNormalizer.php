@@ -16,6 +16,7 @@ use com\realexpayments\remote\sdk\domain\payment\PaymentRequest;
 use com\realexpayments\remote\sdk\domain\payment\Recurring;
 use com\realexpayments\remote\sdk\domain\payment\TssInfo;
 use com\realexpayments\remote\sdk\SafeArrayAccess;
+use com\realexpayments\remote\sdk\utils\NormaliserHelper;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 class PaymentRequestNormalizer extends AbstractNormalizer {
@@ -323,7 +324,7 @@ class PaymentRequestNormalizer extends AbstractNormalizer {
 					'mpi'         => $this->normaliseMpi( $object ),
 					'mobile'      => $object->getMobile(),
 					'token'       => $object->getToken(),
-				) );
+				), array( NormaliserHelper::GetClassName(), "filter_data" ) );
 	}
 
 	private function normaliseAmount( PaymentRequest $request ) {
@@ -351,7 +352,7 @@ class PaymentRequestNormalizer extends AbstractNormalizer {
 			'type'    => $card->getType(),
 			'issueno' => $card->getIssueNumber(),
 			'cvn'     => $this->normaliseCVN( $card )
-		) );
+		), array( NormaliserHelper::GetClassName(), "filter_data" ) );
 	}
 
 	private function normaliseAutoSettle( PaymentRequest $request ) {
@@ -376,7 +377,7 @@ class PaymentRequestNormalizer extends AbstractNormalizer {
 			'@flag'     => $recurring->getFlag(),
 			'@sequence' => $recurring->getSequence(),
 			'@type'     => $recurring->getType()
-		) );
+		), array( NormaliserHelper::GetClassName(), "filter_data" ) );
 	}
 
 	private function recurring_is_empty( PaymentRequest $request ) {
@@ -397,7 +398,7 @@ class PaymentRequestNormalizer extends AbstractNormalizer {
 			'varref'        => $tssInfo->getVariableReference(),
 			'custipaddress' => $tssInfo->getCustomerIpAddress(),
 			'address'       => $tssInfo->getAddresses()
-		) );
+		), array( NormaliserHelper::GetClassName(), "filter_data" ) );
 	}
 
 	private function tss_is_empty( PaymentRequest $request ) {
@@ -418,7 +419,7 @@ class PaymentRequestNormalizer extends AbstractNormalizer {
 			'cavv' => $mpi->getCavv(),
 			'xid'  => $mpi->getXid(),
 			'eci'  => $mpi->getEci()
-		) );
+		), array( NormaliserHelper::GetClassName(), "filter_data" ) );
 	}
 
 	private function mpi_is_empty( PaymentRequest $request ) {
@@ -436,7 +437,7 @@ class PaymentRequestNormalizer extends AbstractNormalizer {
 		return array_filter( array(
 			'number'  => $cvn->getNumber(),
 			'presind' => $cvn->getPresenceIndicator()
-		) );
+		), array( NormaliserHelper::GetClassName(), "filter_data" ) );
 	}
 
 	/**

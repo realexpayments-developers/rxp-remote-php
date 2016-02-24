@@ -51,4 +51,13 @@ interface iRequest {
 	 */
 	public function responseFromXml($xml);
 
+	/**
+	 * <p>
+	 * Getter for the request type.
+	 * </p>
+	 *
+	 * @return String
+	 */
+	public function getType();
+
 }

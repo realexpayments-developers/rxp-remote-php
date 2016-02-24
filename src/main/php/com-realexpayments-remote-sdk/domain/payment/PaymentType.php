@@ -22,6 +22,7 @@ class PaymentType extends EnumBase {
 	const  CREDIT = "credit";
 	const  HOLD = "hold";
 	const  RELEASE = "release";
+	const  QUERY = "query";
 
 	/**
 	 * @var string The payment type String value

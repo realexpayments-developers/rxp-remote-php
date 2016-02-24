@@ -4,8 +4,7 @@ namespace com\realexpayments\remote\sdk;
 
 use com\realexpayments\remote\sdk\domain\iRequest;
 use com\realexpayments\remote\sdk\domain\iResponse;
-use com\realexpayments\remote\sdk\domain\payment\PaymentRequest;
-use com\realexpayments\remote\sdk\domain\payment\PaymentResponse;
+use com\realexpayments\remote\sdk\domain\payment\PaymentType;
 use com\realexpayments\remote\sdk\http\HttpClient;
 use com\realexpayments\remote\sdk\http\HttpConfiguration;
 use com\realexpayments\remote\sdk\http\HttpUtils;
@@ -80,6 +79,12 @@ class RealexClient {
 	 * @var HttpConfiguration http configuration
 	 */
 	private $httpConfiguration;
+
+	/**
+	 * Added to support the query payment type for some merchants.
+	 * @var bool override query response
+	 */
+	private $overrideQueryResponse = false;
 
 	/**
 	 * RealexClient constructor.
@@ -160,6 +165,25 @@ class RealexClient {
 		$this->httpConfiguration = $httpConfiguration;
 	}
 
+	/**
+	 * Getter for overrideQueryResponse
+	 *
+	 * @return bool
+	 */
+	public function isOverrideQueryResponse() {
+		return $this->overrideQueryResponse;
+	}
+
+
+	/**
+	 * Setter for overrideQueryResponse
+	 *
+	 * @param Bool $overrideQueryResponse
+	 */
+	public function setOverrideQueryResponse( $overrideQueryResponse ) {
+		$this->overrideQueryResponse = $overrideQueryResponse;
+	}
+
 
 	/**
 	 * <p>
@@ -208,8 +232,14 @@ class RealexClient {
 
 		//validate response hash
 		$this->logger->debug( "Verifying response hash." );
+		$sharedSecret = $this->secret;
 
-		if ( ! $response->isHashValid( $this->secret ) ) {
+		//if the request type is a query then the shared secret used for the response hash is a blank space
+		if ( PaymentType::QUERY == $request->getType() && ! $this->isOverrideQueryResponse() ) {
+			$sharedSecret = " ";
+		}
+
+		if ( ! $response->isHashValid( $sharedSecret ) ) {
 			//Hash invalid. Throw exception.
 			$this->logger->error( "Response hash is invalid. This response's validity cannot be verified." );
 			throw new RealexException( "Response hash is invalid. This response's validity cannot be verified." );

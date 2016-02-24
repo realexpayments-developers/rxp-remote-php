@@ -11,6 +11,7 @@ use com\realexpayments\remote\sdk\domain\payment\Comment;
 use com\realexpayments\remote\sdk\domain\payment\CommentCollection;
 use com\realexpayments\remote\sdk\domain\threeDSecure\ThreeDSecureRequest;
 use com\realexpayments\remote\sdk\SafeArrayAccess;
+use com\realexpayments\remote\sdk\utils\NormaliserHelper;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 class ThreeDSecureRequestNormalizer extends AbstractNormalizer {
@@ -179,7 +180,7 @@ class ThreeDSecureRequestNormalizer extends AbstractNormalizer {
 			'pares'      => $object->getPares(),
 			'sha1hash'   => $object->getHash(),
 			'comments'   => $hasComments ? array( 'comment' => $comments ) : array()
-		) );
+		), array( NormaliserHelper::GetClassName(), "filter_data" ) );
 	}
 
 	private function normaliseAmount( ThreeDSecureRequest $request ) {
@@ -191,7 +192,7 @@ class ThreeDSecureRequestNormalizer extends AbstractNormalizer {
 		return array_filter( array(
 			'@currency' => $amount->getCurrency(),
 			'#'         => $amount->getAmount()
-		) );
+		), array( NormaliserHelper::GetClassName(), "filter_data" ) );
 	}
 
 	private function normaliseCard( ThreeDSecureRequest $request ) {
@@ -207,7 +208,7 @@ class ThreeDSecureRequestNormalizer extends AbstractNormalizer {
 			'type'    => $card->getType(),
 			'issueno' => $card->getIssueNumber(),
 			'cvn'     => $this->normaliseCVN( $card )
-		) );
+		), array( NormaliserHelper::GetClassName(), "filter_data" ) );
 	}
 
 	private function normaliseCVN( Card $card ) {
@@ -219,7 +220,7 @@ class ThreeDSecureRequestNormalizer extends AbstractNormalizer {
 		return array_filter( array(
 			'number'  => $cvn->getNumber(),
 			'presind' => $cvn->getPresenceIndicator()
-		) );
+		), array( NormaliserHelper::GetClassName(), "filter_data" ) );
 	}
 
 	/**

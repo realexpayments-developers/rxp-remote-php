@@ -250,6 +250,20 @@ $client   = new RealexClient( "mySecret" );
 $response = $client->send( $request );
 ```
 
+
+### Query
+
+```php
+$request = ( new PaymentRequest() )
+	->addAccount( "myAccount" )
+	->addMerchantId( "myMerchantId" )	
+	->addType( PaymentType::QUERY )
+	->addOrderId("Order ID from original transaction");	
+
+$client   = new RealexClient( "mySecret" );
+$response = $client->send( $request );
+```
+
 ## License
 
 See the LICENSE file.                                                                                         

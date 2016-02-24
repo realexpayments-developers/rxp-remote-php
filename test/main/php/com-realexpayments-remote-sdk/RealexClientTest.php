@@ -5,6 +5,7 @@ namespace com\realexpayments\remote\sdk;
 
 use com\realexpayments\remote\sdk\domain\payment\PaymentRequest;
 use com\realexpayments\remote\sdk\domain\payment\PaymentResponse;
+use com\realexpayments\remote\sdk\domain\payment\PaymentType;
 use com\realexpayments\remote\sdk\domain\threeDSecure\ThreeDSecureRequest;
 use com\realexpayments\remote\sdk\domain\threeDSecure\ThreeDSecureResponse;
 use com\realexpayments\remote\sdk\http\HttpConfiguration;
@@ -62,7 +63,7 @@ class RealexClientTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test sending a payment request and receiving a payment response error.
 	 */
-	public function  testSendWithShortErrorResponse() {
+	public function testSendWithShortErrorResponse() {
 
 		//get sample response XML
 		$path            = SampleXmlValidationUtils::PAYMENT_RESPONSE_BASIC_ERROR_XML_PATH;
@@ -105,7 +106,7 @@ class RealexClientTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test sending a payment request and receiving a payment response error.
 	 */
-	public function  testSendWithLongErrorResponse() {
+	public function testSendWithLongErrorResponse() {
 
 		//get sample response XML
 		$path            = SampleXmlValidationUtils::PAYMENT_RESPONSE_FULL_ERROR_XML_PATH;
@@ -146,7 +147,7 @@ class RealexClientTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * Test sending a payment request and receiving a payment response error.
 	 */
-	public function  testSendWithErrorResponseInvalidCode() {
+	public function testSendWithErrorResponseInvalidCode() {
 
 		//get sample response XML
 		$path   = SampleXmlValidationUtils::PAYMENT_RESPONSE_BASIC_ERROR_XML_PATH;
@@ -200,7 +201,7 @@ class RealexClientTest extends \PHPUnit_Framework_TestCase {
 	 *
 	 * @expectedException com\realexpayments\remote\sdk\RealexException
 	 */
-	public function  testSendInvalidResponseHash() {
+	public function testSendInvalidResponseHash() {
 
 		//get sample response XML
 		$path   = SampleXmlValidationUtils::PAYMENT_RESPONSE_XML_PATH;
@@ -315,6 +316,89 @@ class RealexClientTest extends \PHPUnit_Framework_TestCase {
 		$realexClient->send( $request );
 
 		$this->fail( "RealexException should have been thrown before this point." );
+	}
+
+	/**
+	 * Test sending a query request and receiving a valid response where the secret is not used in the response hash.
+	 *
+	 */
+	public function testQueryWithoutSecret() {
+
+		//get sample response XML
+		$path   = SampleXmlValidationUtils::QUERY_PAYMENT_RESPONSE_WITHOUT_SECRET_XML_PATH;
+		$prefix = __DIR__ . '/../../resources';
+		$xml    = file_get_contents( $prefix . $path );
+
+		/** @var PaymentResponse $fromXMLResponse */
+		$fromXMLResponse = new PaymentResponse();
+		$fromXMLResponse = $fromXMLResponse->fromXml( $xml );
+
+		//mock HttpResponse
+		/** @var HttpResponse $httpResponseMock */
+		$httpResponseMock = Phockito::mock( "com\\realexpayments\\remote\\sdk\\http\\HttpResponse" );
+		\Phockito::when( $httpResponseMock->getBody() )->return( $fromXMLResponse->toXML() );
+		\Phockito::when( $httpResponseMock->getResponseCode() )->return( 200 );
+
+
+		// create empty request
+		$request = new PaymentRequest();
+		$request->setType( PaymentType::QUERY );
+
+		$httpConfiguration = new HttpConfiguration();
+		$httpConfiguration->setOnlyAllowHttps( false );
+
+		// mock HttpClient instance
+		$httpClientMock = Phockito::mock( "com\\realexpayments\\remote\\sdk\\http\\HttpClient" );
+		\Phockito::when( $httpClientMock->execute( \Hamcrest_Core_IsAnything::anything(), \Hamcrest_Core_IsAnything::anything() ) )->return( $httpResponseMock );
+
+		// execute and send on client
+		$realexClient = new RealexClient( SampleXmlValidationUtils::SECRET, $httpConfiguration, $httpClientMock );
+		$response     = $realexClient->send( $request );
+
+		// validate response
+		SampleXmlValidationUtils::checkUnmarshalledQueryPaymentResponse( $response, $this, false );
+	}
+
+	/**
+	 * Test sending a query request and receiving a valid response where the secret is not used in the response hash.
+	 *
+	 */
+	public function testQueryWithSecret() {
+
+		//get sample response XML
+		$path   = SampleXmlValidationUtils::QUERY_PAYMENT_RESPONSE_WITH_SECRET_XML_PATH;
+		$prefix = __DIR__ . '/../../resources';
+		$xml    = file_get_contents( $prefix . $path );
+
+		/** @var PaymentResponse $fromXMLResponse */
+		$fromXMLResponse = new PaymentResponse();
+		$fromXMLResponse = $fromXMLResponse->fromXml( $xml );
+
+		//mock HttpResponse
+		/** @var HttpResponse $httpResponseMock */
+		$httpResponseMock = Phockito::mock( "com\\realexpayments\\remote\\sdk\\http\\HttpResponse" );
+		\Phockito::when( $httpResponseMock->getBody() )->return( $fromXMLResponse->toXML() );
+		\Phockito::when( $httpResponseMock->getResponseCode() )->return( 200 );
+
+
+		// create empty request
+		$request = new PaymentRequest();
+		$request->setType( PaymentType::QUERY );
+
+		$httpConfiguration = new HttpConfiguration();
+		$httpConfiguration->setOnlyAllowHttps( false );
+
+		// mock HttpClient instance
+		$httpClientMock = Phockito::mock( "com\\realexpayments\\remote\\sdk\\http\\HttpClient" );
+		\Phockito::when( $httpClientMock->execute( \Hamcrest_Core_IsAnything::anything(), \Hamcrest_Core_IsAnything::anything() ) )->return( $httpResponseMock );
+
+		// execute and send on client
+		$realexClient = new RealexClient( SampleXmlValidationUtils::SECRET, $httpConfiguration, $httpClientMock );
+		$realexClient->setOverrideQueryResponse(true);
+		$response     = $realexClient->send( $request );
+
+		// validate response
+		SampleXmlValidationUtils::checkUnmarshalledQueryPaymentResponse( $response, $this, true );
 	}
 
 

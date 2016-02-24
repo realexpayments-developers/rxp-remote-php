@@ -49,6 +49,9 @@ class SampleXmlValidationUtils {
 	const CREDIT_PAYMENT_REQUEST_XML_PATH = "/sample-xml/credit-payment-request-sample.xml";
 	const HOLD_PAYMENT_REQUEST_XML_PATH = "/sample-xml/hold-payment-request-sample.xml";
 	const RELEASE_PAYMENT_REQUEST_XML_PATH = "/sample-xml/release-payment-request-sample.xml";
+	const QUERY_PAYMENT_REQUEST_XML_PATH = "/sample-xml/query-payment-request-sample.xml";
+	const QUERY_PAYMENT_RESPONSE_WITH_SECRET_XML_PATH = "/sample-xml/query-with-secret-response-sample.xml";
+	const QUERY_PAYMENT_RESPONSE_WITHOUT_SECRET_XML_PATH = "/sample-xml/query-without-secret-response-sample.xml";
 
 
 	//Card
@@ -158,6 +161,19 @@ class SampleXmlValidationUtils {
 	const AVS_ADDRESS = "P";
 	const MOBILE = "apple-pay";
 	const TIMESTAMP_RESPONSE = "20120926112654";
+
+	//query response fields
+	const QUERY_AUTH_CODE = "PP8888";
+	const QUERY_AUTH_TIME_TAKEN = "0";
+	const QUERY_BATCH_ID = "2700738";
+	const QUERY_MESSAGE = "AUTH CODE: PP8888";
+	const QUERY_RESPONSE_ORDER_ID = "HDTtrG-pS-Gza4bdH1MvPg";
+	const QUERY_PASREF = "14496524582825528";
+	const QUERY_NO_SECRET_RESPONSE_HASH = "0667c548f69a9f9a87e6b3497b26ca0750cda72b";
+	const QUERY_WITH_SECRET_RESPONSE_HASH = "32b5e46cc83ec4d42761aba008c25479dabb37a7";
+	const QUERY_TIMESTAMP_RESPONSE = "20151209091437";
+	const QUERY_TIME_TAKEN = "10";
+	const QUERY_RESPONSE_CARD_NUMBER = "424242XXXXXX4242";
 
 	//basic response error fields
 	const MESSAGE_BASIC_ERROR = "error message returned from system";
@@ -272,6 +288,14 @@ class SampleXmlValidationUtils {
 	const RELEASE_ORDER_ID = "292af5fa-6cbc-43d5-b2f0-7fd134d78d95";
 	const RELEASE_REQUEST_HASH = "eec6d1f5dcc51a6a2d2b59af5d2cdb965806d96c";
 
+	//query fields
+	const  QUERY_TIMESTAMP = "20151204142728";
+	const  QUERY_MERCHANT_ID = "thestore";
+	const  QUERY_ACCOUNT = "internet";
+	const  QUERY_ORDER_ID = "012bf34b-3ec9-4c9b-b3a5-700f2f28e57a";
+	const  QUERY_REQUEST_HASH = "e895272ce28c34b2f29247df472495a0a94d79cf";
+
+
 	static function Init() {
 		self::$CARD_CVN_PRESENCE            = new PresenceIndicator( PresenceIndicator::CVN_PRESENT );
 		self::$ADDRESS_TYPE_BUSINESS        = new AddressType( AddressType::BILLING );
@@ -290,6 +314,7 @@ class SampleXmlValidationUtils {
 	 *
 	 * @param PaymentResponse $fromXmlResponse
 	 * @param PHPUnit_Framework_TestCase $testCase
+	 * @param bool $ignoreTssChecks
 	 */
 	public static function checkUnmarshalledPaymentResponse( PaymentResponse $fromXmlResponse, PHPUnit_Framework_TestCase $testCase, $ignoreTssChecks = false ) {
 
@@ -324,6 +349,39 @@ class SampleXmlValidationUtils {
 		$testCase->assertEquals( self::AVS_ADDRESS, $fromXmlResponse->getAvsAddressResponse() );
 		$testCase->assertEquals( self::AVS_POSTCODE, $fromXmlResponse->getAvsPostcodeResponse() );
 		$testCase->assertTrue( $fromXmlResponse->isSuccess() );
+	}
+
+	/**
+	 *  Check all fields match expected values.
+	 *
+	 * @param PaymentResponse $fromXmlResponse
+	 * @param PHPUnit_Framework_TestCase $testCase
+	 * @param bool $secretUsed
+	 */
+	public static function checkUnmarshalledQueryPaymentResponse( PaymentResponse $fromXmlResponse, PHPUnit_Framework_TestCase $testCase, $secretUsed ) {
+
+		$testCase->assertEquals( self::QUERY_ACCOUNT, $fromXmlResponse->getAccount() );
+		$testCase->assertEquals( self::QUERY_AUTH_CODE, $fromXmlResponse->getAuthCode() );
+		$testCase->assertEquals( self::QUERY_AUTH_TIME_TAKEN, $fromXmlResponse->getAuthTimeTaken() );
+		$testCase->assertEquals( self::QUERY_BATCH_ID, $fromXmlResponse->getBatchId() );
+		$testCase->assertEquals( self::QUERY_MERCHANT_ID, $fromXmlResponse->getMerchantId() );
+		$testCase->assertEquals( self::QUERY_MESSAGE, $fromXmlResponse->getMessage() );
+		$testCase->assertEquals( self::QUERY_RESPONSE_ORDER_ID, $fromXmlResponse->getOrderId() );
+		$testCase->assertEquals( self::QUERY_PASREF, $fromXmlResponse->getPaymentsReference() );
+		$testCase->assertEquals( self::RESULT_SUCCESS, $fromXmlResponse->getResult() );
+		$testCase->assertEquals( self::QUERY_TIMESTAMP_RESPONSE, $fromXmlResponse->getTimeStamp() );
+		$testCase->assertEquals( self::QUERY_TIME_TAKEN, $fromXmlResponse->getTimeTaken() );
+		$testCase->assertEquals( self::QUERY_RESPONSE_CARD_NUMBER, $fromXmlResponse->getCardNumber() );
+		$testCase->assertTrue( $fromXmlResponse->isSuccess() );
+
+		if ($secretUsed)
+		{
+			$testCase->assertEquals( self::QUERY_WITH_SECRET_RESPONSE_HASH, $fromXmlResponse->getHash() );
+		}
+		else
+		{
+			$testCase->assertEquals( self::QUERY_NO_SECRET_RESPONSE_HASH, $fromXmlResponse->getHash() );
+		}
 	}
 
 	/**
@@ -486,19 +544,19 @@ class SampleXmlValidationUtils {
 		$testCase->assertEquals( PaymentType::OTB, $fromXmlRequest->getType() );
 
 		$testCase->assertEquals( self::CARD_NUMBER, $fromXmlRequest->getCard()->getNumber() );
-		$testCase->assertEquals( self::$CARD_TYPE->getType(), $fromXmlRequest->getCard()->getType());
- 		$testCase->assertEquals( self::CARD_HOLDER_NAME, $fromXmlRequest->getCard()->getCardHolderName() );
- 		$testCase->assertEquals( self::CARD_CVN_NUMBER,  $fromXmlRequest->getCard()->getCvn()->getNumber() );
- 		$testCase->assertEquals( self::$CARD_CVN_PRESENCE->getIndicator(), $fromXmlRequest->getCard()->getCvn()->getPresenceIndicator());
- 		$testCase->assertEquals( self::CARD_ISSUE_NUMBER , $fromXmlRequest->getCard()->getIssueNumber() );
- 		$testCase->assertEquals( self::CARD_EXPIRY_DATE, $fromXmlRequest->getCard()->getExpiryDate() );
- 		$testCase->assertEquals( self::OTB_ACCOUNT, $fromXmlRequest->getAccount() );
- 		$testCase->assertEquals( self::OTB_MERCHANT_ID, $fromXmlRequest->getMerchantId() );
- 		$testCase->assertEquals( self::$OTB_AUTO_SETTLE_FLAG->getFlag(), $fromXmlRequest->getAutoSettle()->getFlag());
- 		$testCase->assertEquals( self::OTB_TIMESTAMP, $fromXmlRequest->getTimeStamp() );
- 		$testCase->assertEquals( self::OTB_ORDER_ID, $fromXmlRequest->getOrderId() );
- 		$testCase->assertEquals( self::OTB_REQUEST_HASH, $fromXmlRequest->getHash() );
- 	}
+		$testCase->assertEquals( self::$CARD_TYPE->getType(), $fromXmlRequest->getCard()->getType() );
+		$testCase->assertEquals( self::CARD_HOLDER_NAME, $fromXmlRequest->getCard()->getCardHolderName() );
+		$testCase->assertEquals( self::CARD_CVN_NUMBER, $fromXmlRequest->getCard()->getCvn()->getNumber() );
+		$testCase->assertEquals( self::$CARD_CVN_PRESENCE->getIndicator(), $fromXmlRequest->getCard()->getCvn()->getPresenceIndicator() );
+		$testCase->assertEquals( self::CARD_ISSUE_NUMBER, $fromXmlRequest->getCard()->getIssueNumber() );
+		$testCase->assertEquals( self::CARD_EXPIRY_DATE, $fromXmlRequest->getCard()->getExpiryDate() );
+		$testCase->assertEquals( self::OTB_ACCOUNT, $fromXmlRequest->getAccount() );
+		$testCase->assertEquals( self::OTB_MERCHANT_ID, $fromXmlRequest->getMerchantId() );
+		$testCase->assertEquals( self::$OTB_AUTO_SETTLE_FLAG->getFlag(), $fromXmlRequest->getAutoSettle()->getFlag() );
+		$testCase->assertEquals( self::OTB_TIMESTAMP, $fromXmlRequest->getTimeStamp() );
+		$testCase->assertEquals( self::OTB_ORDER_ID, $fromXmlRequest->getOrderId() );
+		$testCase->assertEquals( self::OTB_REQUEST_HASH, $fromXmlRequest->getHash() );
+	}
 
 	/**
 	 * Check all fields match expected values->
@@ -559,6 +617,25 @@ class SampleXmlValidationUtils {
 		$testCase->assertEquals( self::RELEASE_ORDER_ID, $fromXmlRequest->getOrderId() );
 		$testCase->assertEquals( self::RELEASE_REQUEST_HASH, $fromXmlRequest->getHash() );
 		$testCase->assertEquals( self::RELEASE_PASREF, $fromXmlRequest->getPaymentsReference() );
+	}
+
+	/**
+	 * Check all fields match expected values->
+	 *
+	 * @param PaymentRequest $fromXmlRequest
+	 * @param PHPUnit_Framework_TestCase $testCase
+	 */
+	public static function checkUnmarshalledQueryPaymentRequest( PaymentRequest $fromXmlRequest, PHPUnit_Framework_TestCase $testCase ) {
+
+		$testCase->assertNotNull( $fromXmlRequest );
+		$testCase->assertEquals( PaymentType::QUERY, $fromXmlRequest->getType() );
+
+		$testCase->assertEquals( self::QUERY_ACCOUNT, $fromXmlRequest->getAccount() );
+		$testCase->assertEquals( self::QUERY_MERCHANT_ID, $fromXmlRequest->getMerchantId() );
+		$testCase->assertEquals( self::QUERY_TIMESTAMP, $fromXmlRequest->getTimeStamp() );
+		$testCase->assertEquals( self::QUERY_ORDER_ID, $fromXmlRequest->getOrderId() );
+		$testCase->assertEquals( self::QUERY_REQUEST_HASH, $fromXmlRequest->getHash() );
+
 	}
 
 	/**

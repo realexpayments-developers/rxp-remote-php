@@ -798,6 +798,24 @@ class XmlUtilsTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * Tests conversion of {@link PaymentRequest} from XML file for query payment types.
+	 */
+	public function testQueryRequestXmlFromFileRelease() {
+
+
+		$path   = SampleXmlValidationUtils::QUERY_PAYMENT_REQUEST_XML_PATH;
+		$prefix = __DIR__ . '/../../../resources';
+		$xml    = file_get_contents( $prefix . $path );
+
+		//unmarshal back to request
+		/* @var PaymentRequest $fromXmlRequest */
+		$fromXmlRequest = new PaymentRequest();
+		$fromXmlRequest = $fromXmlRequest->fromXml( $xml );
+		SampleXmlValidationUtils::checkUnmarshalledQueryPaymentRequest( $fromXmlRequest, $this );
+
+	}
+
+	/**
 	 * Tests that press indicator is sent correctly even when it is out of range
 	 */
 	public function testPressIndicator() {

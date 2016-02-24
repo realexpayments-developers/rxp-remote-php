@@ -73,6 +73,12 @@ class PaymentResponse implements iResponse {
 	private $paymentsReference;
 
 	/**
+	 * @var string The masked card number returned for query request types.
+	 *
+	 */
+	private $cardNumber;
+
+	/**
 	 * <p>
 	 * The result of the Card Verification check.
 	 * </p>
@@ -398,6 +404,25 @@ class PaymentResponse implements iResponse {
 	public function setPaymentsReference( $paymentsReference ) {
 		$this->paymentsReference = $paymentsReference;
 	}
+
+	/**
+	 * Getter for cardNumber
+	 *
+	 * @return string
+	 */
+	public function getCardNumber() {
+		return $this->cardNumber;
+	}
+
+	/**
+	 * Setter for cardNumber
+	 *
+	 * @param string $cardNumber
+	 */
+	public function setCardNumber( $cardNumber) {
+		$this->cardNumber = $cardNumber;
+	}
+
 
 	/**
 	 * Getter for cvnResult
