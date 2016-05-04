@@ -82,9 +82,12 @@ class RealexClient {
 
 	/**
 	 * Added to support the query payment type for some merchants.
-	 * @var bool override query response
+	 * When it is set to true the secret will be blank for query responses
+	 * When it is set to false the secret will follow the usual rules
+	 * Default value is true
+	 * @var bool use blank password on query response
 	 */
-	private $overrideQueryResponse = false;
+	private $useBlankSecretOnQueryResponse = true;
 
 	/**
 	 * RealexClient constructor.
@@ -166,22 +169,22 @@ class RealexClient {
 	}
 
 	/**
-	 * Getter for overrideQueryResponse
+	 * Getter for useBlankSecretOnQueryResponse
 	 *
 	 * @return bool
 	 */
-	public function isOverrideQueryResponse() {
-		return $this->overrideQueryResponse;
+	public function isUsingBlankSecretOnQueryResponse() {
+		return $this->useBlankSecretOnQueryResponse;
 	}
 
 
 	/**
-	 * Setter for overrideQueryResponse
+	 * Setter for useBlankSecretOnQueryResponse
 	 *
-	 * @param Bool $overrideQueryResponse
+	 * @param Bool $useBlankSecretOnQueryResponse
 	 */
-	public function setOverrideQueryResponse( $overrideQueryResponse ) {
-		$this->overrideQueryResponse = $overrideQueryResponse;
+	public function useBlankSecretOnQueryResponse( $useBlankSecretOnQueryResponse ) {
+		$this->useBlankSecretOnQueryResponse = $useBlankSecretOnQueryResponse;
 	}
 
 
@@ -235,7 +238,7 @@ class RealexClient {
 		$sharedSecret = $this->secret;
 
 		//if the request type is a query then the shared secret used for the response hash is a blank space
-		if ( PaymentType::QUERY == $request->getType() && ! $this->isOverrideQueryResponse() ) {
+		if ( PaymentType::QUERY == $request->getType() && $this->isUsingBlankSecretOnQueryResponse() ) {
 			$sharedSecret = " ";
 		}
 
