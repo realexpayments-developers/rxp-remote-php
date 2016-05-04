@@ -394,7 +394,7 @@ class RealexClientTest extends \PHPUnit_Framework_TestCase {
 
 		// execute and send on client
 		$realexClient = new RealexClient( SampleXmlValidationUtils::SECRET, $httpConfiguration, $httpClientMock );
-		$realexClient->setOverrideQueryResponse(true);
+		$realexClient->useBlankSecretOnQueryResponse(false);
 		$response     = $realexClient->send( $request );
 
 		// validate response
