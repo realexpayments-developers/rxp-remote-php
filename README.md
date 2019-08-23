@@ -1,8 +1,14 @@
+# Please use our new PHP SDK
+We've moved. We highly recommend you use the Global Payments PHP SDK
+which supports all the features of this SDK and will benefit from all future releases:
+https://github.com/globalpayments/php-sdk
+
 # Realex Payments Remote PHP SDK
-You can sign up for a free Realex Payments sandbox account at https://www.realexpayments.co.uk/developers
+You can sign up for a Global Payments (formerly Realex Payments) account at https://developer.globalpay.com
 
 ## Requirements
 - PHP >= 5.3.9
+- For security and support we highly recommend you use PHP 7
 - Composer (https://getcomposer.org/)
 
 ## Instructions
